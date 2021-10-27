@@ -1,0 +1,17 @@
+{
+    "users":[
+        {
+            "nom":"PETITJEAN",
+            "prenom":"Gauthier",
+            "diplome":"Ingénieur Informatique Cybersécurité",
+            "mail":"gauthier.petitjean@cy-tech.fr"
+        },
+        {
+            "nom":"SERABIAN",
+            "prenom":"Thomas",
+            "diplome":"Ingénieur Informatique Cybersécurité",
+            "mail":"thomas.serabian@cy-tech.fr"
+            
+        }
+    ]
+}
