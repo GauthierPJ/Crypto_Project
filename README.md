@@ -10,9 +10,16 @@ git commit -m "Commentaire sur ce qui a été modifié
 git push
 ```
 
-Générer le certificat avec les infos cachés et le qr code : 
+* Générer le certificat avec les infos cachés et le qr code.
 
-1. Se rendre dans le dossier scripts
-2. `./sign_data.sh <nom> <prenom> <email> <formation>
+  1. Se rendre dans le dossier scripts
+  2. `./CreerAttestation <prenom> <nom> <email> <formation>
+
+* Vérifier l'authenticité d'une attestation
+
+  1. Se rendre dans le dossier scripts
+  2. `./VerifierAttestation <chemin_de_l'attestation>
+
+
 
 `
