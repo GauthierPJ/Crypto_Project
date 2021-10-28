@@ -1,12 +1,17 @@
 const path = require('path');
 const express = require('express');
+const fs = require('fs')
 const app = express();
+const bodyParser = require('body-parser')
+const fileUpload = require('express-fileupload');
 
 const shell = require('shelljs')
-
+app.use(fileUpload({
+  createParentPath: true
+}));
 app.use(express.static(path.join(__dirname, 'public')))
-
-const cookieParser = require('cookie-parser')
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
 var compteSecret = ""
 
@@ -65,8 +70,14 @@ function decrypt(text,password){
   var pass = false
   if(req.headers.cookie.replace('session=')!=""){
     var cookie = req.headers.cookie
-    user = decrypt(cookie.split('session=')[1],"HyperSafelyEncodedCookie")
-    console.log(user)
+    let cookies_sep = cookie.split(";")
+    for (let i = 0; i < cookies_sep.length; i++) {
+      cookie = cookies_sep[i].split('=')[0].trim()
+      if(cookie=="session"){
+        user=decrypt(cookies_sep[i].split('=')[1].trim(),"HyperSafelyEncodedCookie")
+        
+      }
+    }
     try {
       cookie = JSON.parse(user)
       if((cookie.role==role) && ((cookie.time+(5*60000))>Date.now())){
@@ -105,13 +116,10 @@ const qrcode = require('qrcode');
 
 /*#################### ROUTES ####################*/
 app.get('/register', function (req, res) {
-
     const secretCode = speakeasy.generateSecret({
         name: "CYTECH-Certificate-Delivery",
   });
   
-  
-  //console.log(secretCode)
   compteSecret = secretCode.ascii
   qrcode.toDataURL(secretCode.otpauth_url,function(err,data){
       if(err){throw err}
@@ -120,6 +128,24 @@ app.get('/register', function (req, res) {
       }
   })
 });
+
+
+app.get('/verify',function(req,res){
+  res.sendFile('views/verify.html', {root: __dirname });
+})
+
+app.post('/verify',function(req,res){
+  file = req.files.file
+  fs.writeFile("tmp/"+file.name, file.data,function(){
+    value = shell.exec('./VerifierAttestation.py tmp/'+file.name)    
+    if(value.stdout=="OK\n"){
+      res.sendFile('views/valide.html', {root: __dirname })
+    }
+    else{
+      res.sendFile('views/invalide.html', {root: __dirname })
+    }
+  })
+})
 
 app.get('/login',function(req,res){
     res.sendFile('views/login.html', {root: __dirname })
@@ -145,42 +171,28 @@ app.post('/login',function(req, res) {
 
 
 app.get('/admin',function(req,res){
-
   if(verifyAuth("admin",res,req)){
-    
-    html ="<h2>Demandes certificats :</h2></br><table>"
+      res.cookie('data',JSON.stringify(db.users))
+      res.sendFile('views/demandes.html', {root: __dirname })
 
-    for (let i = 0; i < db.users.length; i++) {
-      html+='<tr><td>'+db.users[i].nom+'</td><td>'+db.users[i].prenom+'</td><td>'+db.users[i].diplome+'</td>'
-      html+='<td><form action="/valider" method="POST"><button name="id" value='+i+' type="submit">Valider</button</form></td></tr>'
-    }
-    html +="</table>"
-    demande = "<form action='/demande' method='POST'><input type='hidden' name='cert' type='text' value=''><input type='submit' value='Valider'</form>"
-    res.send(html)
 
   }
-
-
 })
 
 app.post('/valider',function(req,res){
   if(verifyAuth("admin",res,req)){
     //generation certif + envoie par mail
     var user = db.users[req.body.id]
-    shell.exec('./sign_data.sh '+user.nom+' '+user.prenom+' '+user.mail+' '+user.diplome.replace(' ','-'))
+    shell.exec('./CreerAttestation.py '+user.nom+' '+user.prenom+' '+user.mail+' '+user.diplome)
     
     text="Bonjour,\n Veuillez trouver en pièce jointe votre certificat.\nCordialement."
     sendMail(user.mail,'CYTECH - Votre certificat',text,'./ressources/Attestation_steg.png')
-    
-    
-    res.end("Votre certificat vous a été envoyé par mail")
+    res.sendFile('views/envoyer.html', {root: __dirname })
+
     
   }
 })
 
-app.get('/test_shell',function(){
-  shell.exec('ls -la')
-})
 
   app.listen(8000, () => {
     console.log(`Example app listening at http://localhost:8000`)

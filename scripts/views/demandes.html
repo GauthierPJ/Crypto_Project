@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <h2>Demandes de certificats</h2>
+        <p>Vous pouvez accepter les demandes de diplôme suivantes :</p>
+        <table id="data">
+
+        </table>
+        <script>
+            pre_data = document.cookie
+            pre_data = pre_data.split(";")
+            for (let i = 0; i < pre_data.length; i++) {
+                nom = element = pre_data[i].split("=")[0].trim();
+                valeur = element = pre_data[i].split("=")[1].trim();
+                if(nom=="data"){
+                    data = JSON.parse(decodeURI(valeur).replaceAll('%3A',':').replaceAll('%2C',','))
+                }
+            }
+
+            for (let i = 0; i < data.length; i++) {
+                document.getElementById('data').innerHTML += "<tr><td>"+data[i].nom+"</td><td>"+data[i].prenom+"</td><td>"+data[i].diplome.replaceAll('_',' ')+"</td><td><form method='POST' action='/valider'>&nbsp;<button type='submit' name='id' value="+i+">Valider</button></form></td><hr></tr>"
+                
+            }
+
+        </script>
+    </body>
+</html>
