@@ -28,7 +28,7 @@ function sendMail(destinataire,object,content,file){
       service: 'gmail',
       auth: {
         user: 'serabianth@cy-tech.fr',
-        pass: 'Bohm4aeX'
+        pass: 'password'
       }
     });
         
