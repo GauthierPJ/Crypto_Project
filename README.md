@@ -1,25 +1,12 @@
 # Crypto_Project
 Projet de cryptographie réalisé dans le cadre du cours de CY-Tech.
 
-# Mémo git 
-
-```bash
-git pull
-git add fichier_1, fichier_2,..,fichier_n 
-git commit -m "Commentaire sur ce qui a été modifié
-git push
-```
-
-* Générer le certificat avec les infos cachés et le qr code.
+- Générer le certificat avec les infos cachés et le qr code.
 
   1. Se rendre dans le dossier scripts
-  2. `./CreerAttestation [prenom] [nom] [email] [formation]
+  2. `./CreerAttestation [prenom] [nom] [email] [formation]`
 
-* Vérifier l'authenticité d'une attestation
+- Vérifier l'authenticité d'une attestation
 
   1. Se rendre dans le dossier scripts
-  2. `./VerifierAttestation [chemin_de_l'attestation]
-
-
-
-`
+  2. `./VerifierAttestation [chemin_de_l'attestation]`
